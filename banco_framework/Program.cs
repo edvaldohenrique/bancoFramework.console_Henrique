@@ -76,7 +76,7 @@ internal class Program
         Console.WriteLine("1 - Deposito \n2 - Saque \n3 - Sair ");
     }
 
-    static void Depositar(Cliente cliente)
+    private static void Depositar(Cliente cliente)
     {
         var calculo = new Calculo();
 
@@ -87,7 +87,7 @@ internal class Program
         Console.WriteLine($"O valor atualizado do saldo é: {cliente.Saldo}");
     }
 
-    static void Sacar(Cliente cliente)
+    private static void Sacar(Cliente cliente)
     {
         var calculo = new Calculo();
 
