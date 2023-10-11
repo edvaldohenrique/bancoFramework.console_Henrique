@@ -1,4 +1,5 @@
-﻿using Domain.Model;
+﻿using Application;
+using Domain.Model;
 
 internal class Program
 {
@@ -9,66 +10,102 @@ internal class Program
         Console.WriteLine("Por favor, identifique-se");
         Console.WriteLine("");
 
-        var pessoa = Identificacao();
+        var cliente = Identificacao();
 
-        Menu();
+        Menu(cliente);
 
     }
 
-    static Pessoa Identificacao()
+    static Cliente Identificacao()
     {
-        var pessoa = new Pessoa();
+        var cliente = new Cliente();
 
         Console.WriteLine("Seu número de identificação:");
-        pessoa.Id = int.Parse(Console.ReadLine());
+        cliente.Id = int.Parse(Console.ReadLine());
 
         Console.WriteLine("Seu nome:");
-        pessoa.Nome = Console.ReadLine();
+        cliente.Nome = Console.ReadLine();
 
         Console.WriteLine("Seu CPF:");
-        pessoa.Cpf = Console.ReadLine();
+        cliente.Cpf = Console.ReadLine();
+
+        Console.WriteLine("Seu saldo: ");
+        cliente.Saldo = float.Parse(Console.ReadLine());
         Console.Clear();
 
-        Console.WriteLine($"Como posso ajudar {pessoa.Nome}?");
+        Console.WriteLine($"Como posso ajudar {cliente.Nome}?");
 
-        return pessoa;
+        return cliente;
     }
 
-    static void Menu()
+    static void Menu(Cliente cliente)
     {
         ItensMenu();
-        int opcao;
-        
-        while (!int.TryParse(Console.ReadLine(), out opcao)) 
-        {
-            Console.Clear();
-            ItensMenu();
-        }
+        int opcao = 0;
 
-        switch (opcao)
+        while (true)
         {
-            case 1:
-                Console.WriteLine("Deposito");
-                Console.ReadKey();
-                break;
-            case 2:
-                Console.WriteLine("Saque");
-                Console.ReadKey();
-                break;
-            case 3:
-                Environment.Exit(0);
-                break;
-            default:
+            while (!int.TryParse(Console.ReadLine(), out opcao))
+            {
                 Console.Clear();
-                Menu();
-                break;
+                ItensMenu();
+            }
 
+            switch (opcao)
+            {
+                case 1:
+                    Depositar(cliente);
+                    break;
+                case 2:
+                    Sacar(cliente);
+                    break;
+                case 3:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.Clear();
+                    Menu(cliente);
+                    break;
+
+            }
         }
     }
 
     static void ItensMenu()
     {
         Console.WriteLine("1 - Deposito \n2 - Saque \n3 - Sair ");
+    }
+
+    static void Depositar(Cliente cliente)
+    {
+        var calculo = new Calculo();
+
+        Console.WriteLine("Informe quanto deseja depositar: ");
+        float valorDeposito = float.Parse(Console.ReadLine());
+
+        cliente.Saldo = calculo.Soma(cliente.Saldo, valorDeposito);
+        Console.WriteLine($"O valor atualizado do saldo é: {cliente.Saldo}");
+    }
+
+    static void Sacar(Cliente cliente)
+    {
+        var calculo = new Calculo();
+
+        Console.WriteLine("Informe quanto deseja sacar: ");
+        float valorSaque = float.Parse(Console.ReadLine());
+
+        float valorFinal = calculo.Subtrai(cliente.Saldo, valorSaque);
+
+        if(valorFinal < 0)
+        {
+            Console.WriteLine("Saldo insuficiente para operação.");
+        }
+        else
+        {
+            cliente.Saldo = valorFinal;
+            Console.WriteLine($"O valor atualizado do saldo é: {valorFinal}");
+        }
+       
     }
 
 }
