@@ -3,5 +3,7 @@
     public class Cliente : Pessoa
     {
         public float Saldo { get; set; }
+        public bool NovoCliente { get; set; }
+
     }
 }

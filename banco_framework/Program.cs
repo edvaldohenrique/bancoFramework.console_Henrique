@@ -1,15 +1,17 @@
 ﻿using Application;
 using CpfCnpjLibrary;
 using Domain.Model;
+using Repository;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        bool flag = false;
+        bool ClienteValido = false;
         Cliente cliente = new Cliente();
+        ClienteRepository clienteRepository = new ClienteRepository();
 
-        while (!flag)
+        while (!ClienteValido)
         {
             Console.Clear();
             Console.WriteLine("Seja bem vindo ao banco Framework");
@@ -17,19 +19,39 @@ internal class Program
             Console.WriteLine("");
 
             cliente = Identificacao();
-            flag = ValidaCliente(cliente);
+            ClienteValido = ValidaCliente(cliente);
+
+            if (cliente.NovoCliente && ClienteValido)
+                clienteRepository.Insert(cliente);
         }
 
         Menu(cliente);
 
     }
 
-    static Cliente Identificacao()
+    private static Cliente Identificacao()
+    { 
+        ClienteRepository clienteRepository = new ClienteRepository();
+        
+        int id = ObterId();
+
+        Cliente clienteConsulta = clienteRepository.GetbyId(id);
+
+        if (clienteConsulta != null)
+        {
+            Console.Clear();
+            clienteConsulta.NovoCliente = false;
+            return clienteConsulta;
+        }
+
+        return SolicitaDadosUsuario(id);
+
+    }
+
+    private static Cliente SolicitaDadosUsuario(int id)
     {
         var cliente = new Cliente();
-
-        
-        cliente.Id = ObterId();
+        cliente.Id = id;
 
         Console.WriteLine("Seu nome:");
         cliente.Nome = Console.ReadLine();
@@ -40,6 +62,8 @@ internal class Program
         Console.WriteLine("Seu saldo: ");
         cliente.Saldo = float.Parse(Console.ReadLine());
         Console.Clear();
+
+        cliente.NovoCliente = true;
 
         return cliente;
     }
@@ -106,17 +130,20 @@ internal class Program
     private static void Depositar(Cliente cliente)
     {
         var calculo = new Calculo();
+        ClienteRepository clienteRepository = new ClienteRepository();
 
         Console.WriteLine("Informe quanto deseja depositar: ");
         float valorDeposito = float.Parse(Console.ReadLine());
 
         cliente.Saldo = calculo.Soma(cliente.Saldo, valorDeposito);
+        clienteRepository.UpdateSaldo(cliente);
         Console.WriteLine($"O valor atualizado do saldo é: {cliente.Saldo}");
     }
 
     private static void Sacar(Cliente cliente)
     {
         var calculo = new Calculo();
+        ClienteRepository clienteRepository = new ClienteRepository();
 
         Console.WriteLine("Informe quanto deseja sacar: ");
         float valorSaque = float.Parse(Console.ReadLine());
@@ -130,6 +157,7 @@ internal class Program
         else
         {
             cliente.Saldo = valorFinal;
+            clienteRepository.UpdateSaldo(cliente);
             Console.WriteLine($"O valor atualizado do saldo é: {valorFinal}");
         }
        
