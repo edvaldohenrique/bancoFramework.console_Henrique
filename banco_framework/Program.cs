@@ -1,16 +1,24 @@
 ﻿using Application;
+using CpfCnpjLibrary;
 using Domain.Model;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        Console.Clear();
-        Console.WriteLine("Seja bem vindo ao banco Framework");
-        Console.WriteLine("Por favor, identifique-se");
-        Console.WriteLine("");
+        bool flag = false;
+        Cliente cliente = new Cliente();
 
-        var cliente = Identificacao();
+        while (!flag)
+        {
+            Console.Clear();
+            Console.WriteLine("Seja bem vindo ao banco Framework");
+            Console.WriteLine("Por favor, identifique-se");
+            Console.WriteLine("");
+
+            cliente = Identificacao();
+            flag = ValidaCliente(cliente);
+        }
 
         Menu(cliente);
 
@@ -20,8 +28,8 @@ internal class Program
     {
         var cliente = new Cliente();
 
-        Console.WriteLine("Seu número de identificação:");
-        cliente.Id = int.Parse(Console.ReadLine());
+        
+        cliente.Id = ObterId();
 
         Console.WriteLine("Seu nome:");
         cliente.Nome = Console.ReadLine();
@@ -33,18 +41,37 @@ internal class Program
         cliente.Saldo = float.Parse(Console.ReadLine());
         Console.Clear();
 
-        Console.WriteLine($"Como posso ajudar {cliente.Nome}?");
-
         return cliente;
+    }
+
+    private static int ObterId()
+    {
+        int id; 
+        while(true)
+        {
+            Console.WriteLine("Seu número de identificação:");
+
+            if (int.TryParse(Console.ReadLine(), out id))
+            {
+                return id;   
+            }
+
+            Console.WriteLine("Indentificação inválida. Informe apenas números.");
+            Console.ReadKey();
+            Console.Clear();
+        }
     }
 
     static void Menu(Cliente cliente)
     {
-        ItensMenu();
         int opcao = 0;
+
+        Console.WriteLine($"Como posso ajudar {cliente.Nome}?");
+        ItensMenu();
 
         while (true)
         {
+
             while (!int.TryParse(Console.ReadLine(), out opcao))
             {
                 Console.Clear();
@@ -73,7 +100,7 @@ internal class Program
 
     static void ItensMenu()
     {
-        Console.WriteLine("1 - Deposito \n2 - Saque \n3 - Sair ");
+        Console.WriteLine("1 - Deposito \n2 - Saque \n3 - Sair \n*-------------");
     }
 
     private static void Depositar(Cliente cliente)
@@ -106,6 +133,31 @@ internal class Program
             Console.WriteLine($"O valor atualizado do saldo é: {valorFinal}");
         }
        
+    }
+
+    private static bool ValidaCliente(Cliente cliente)
+    {
+        IList<string> erros = new List<string>();
+        
+        if (!Cpf.Validar(cliente.Cpf))
+            erros.Add("CPF invalido");
+        if (cliente.Saldo <= 0)
+            erros.Add("Saldo informado deve ser maior que zero");
+
+        if (erros.Count > 0)
+        {
+            Console.WriteLine("As seguintes inconsistencias foram detectadas: \n");
+            foreach (var item in erros)
+            {
+                Console.WriteLine(" - "+item+"\n");
+            }
+
+            Console.ReadKey();
+
+            return false;
+        }
+
+        return true;
     }
 
 }
