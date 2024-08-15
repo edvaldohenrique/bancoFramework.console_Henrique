@@ -90,8 +90,8 @@ internal class Program
     {
         int opcao = 0;
 
-        Console.WriteLine($"Como posso ajudar {cliente.Nome}?");
-        ItensMenu();
+        
+        ItensMenu(cliente.Nome);
 
         while (true)
         {
@@ -99,7 +99,7 @@ internal class Program
             while (!int.TryParse(Console.ReadLine(), out opcao))
             {
                 Console.Clear();
-                ItensMenu();
+                ItensMenu(cliente.Nome);
             }
 
             switch (opcao)
@@ -122,8 +122,9 @@ internal class Program
         }
     }
 
-    static void ItensMenu()
+    static void ItensMenu(string nomeCliente)
     {
+        Console.WriteLine($"Como posso ajudar {nomeCliente}?");
         Console.WriteLine("1 - Deposito \n2 - Saque \n3 - Sair \n*-------------");
     }
 
